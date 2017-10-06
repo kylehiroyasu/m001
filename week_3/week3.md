@@ -1,0 +1,67 @@
+# Week 3
+
+## Query Operators
+
+> For which CRUD operations can one use the query operators we will discuss in this chapter?
+> * They can be used for any of the CRUD operations
+
+### Comparison Operators
+
+* `gt`: greater than
+* `lt`: less than
+* `gte`/`lte`: greater than or equal/ less than or equal
+
+Example using them together on the same field:
+
+db.movieDetails.find({runtime: {$gte: 90, $lte: 120}}, {_id:0, title:1, runtime:1})
+
+Using equality filters across mutliple fields:
+
+db.movieDetails.find({runtime: {$gte: 180}, "tomato.meter": {$gte: 95}}, {_id:0, title:1, runtime:1})
+
+Using the not equal filter
+
+db.movieDetails.find({rated: {$ne: "UNRATED"}}
+
+ * NOTE: this include not only "UNRATED" films but also films without a rating field
+
+Using in an array
+
+db.movieDetails.find({rated: {$ne: {$in: ["UNRATED", "PG-13"]}}}
+
+> Using the $in operator, filter the video.movieDetails collection to determine how many movies list either
+> "Ethan Coen" or "Joel Coen" among their writers. Your filter should match all movies that list either of
+> the Coen brothers as writers regardless of how many other writers are also listed. Select the number of
+> movies matching this filter from the choices below.
+
+```
+
+use video
+db.movieDetails.find({writers: { $in: ["Ethan Coen", "Joel Coen"]}}).count()
+
+```
+
+### Element Operators
+
+* `$exists`: search if key does or does not exist, can also use `null` which will find all docs with value set to null or where the key does not exist
+* `$type`: can specify the type of the values the documents should have
+
+examples:
+```
+
+db.movieDetails.find({mpaaRating: {$exists:false}})
+db.movieDetails.find({"tomato.consensus":null})
+db.movieDetails.find({viewerRating: {$type: "double"})
+
+```
+
+> Connect to our class Atlas cluster from the mongo shell or Compass and answer the following question.
+> How many documents in the `100YWeatherSmall.data` collection do NOT contain the key `atmosphericPressureChange`.
+
+```
+
+use 100YWeatherSmall
+db.data.find({atmosphericPressureChange:{$exists:false}})
+
+```
+
