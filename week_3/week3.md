@@ -65,3 +65,43 @@ db.data.find({atmosphericPressureChange:{$exists:false}})
 
 ```
 
+###  Logical Operators
+
+* `$or`: can be use to or on an array of multiple field/keys
+
+`db.movieDetails.find({$or: [{"tomato.meter": {$gt: 95}}, {"metacritic": {$gt:88}}]})`
+
+* `$and`: similar behavior to or, but same as doing a normal find query
+
+```
+// same results
+db.movieDetails.find({$and: [{"tomato.meter": {$gt: 95}}, {"metacritic": {$gt: 88}}]})
+db.movieDetails.find({"tomato.meter": {$gt: 95}, "metacritic": {$gt: 88})
+
+//more useful example
+db.movieDetails.find({$and: [{"metacritc": {$ne:null}},{"metacritic": {$exists:true}}]})
+
+```
+
+> Connect to our class Atlas cluster from the mongo shell or Compass and view the `ships.shipwrecks`
+> collection. In this collection, `watlev` describes the water level at the shipwreck site and `depth`
+> describes how far below sea level the ship rests. How many documents in the `ships.shipwrecks`
+> collection match either of the following criteria: `watlev` equal to "always dry" or `depth` equal to 0.
+
+
+```
+use ships
+
+db.shipwrecks.find({$or : [{watlev:"always dry"}, {depth: 0}]}).count()
+
+```
+
+## All
+
+* `$all` : all the values must be included in the keys array
+* specified as the value of a given key instead including key value pairs
+
+```
+
+```
+
