@@ -35,7 +35,6 @@ db.movieDetails.find({rated: {$ne: {$in: ["UNRATED", "PG-13"]}}}
 > movies matching this filter from the choices below.
 
 ```
-
 use video
 db.movieDetails.find({writers: { $in: ["Ethan Coen", "Joel Coen"]}}).count()
 
@@ -48,7 +47,6 @@ db.movieDetails.find({writers: { $in: ["Ethan Coen", "Joel Coen"]}}).count()
 
 examples:
 ```
-
 db.movieDetails.find({mpaaRating: {$exists:false}})
 db.movieDetails.find({"tomato.consensus":null})
 db.movieDetails.find({viewerRating: {$type: "double"})
@@ -59,7 +57,6 @@ db.movieDetails.find({viewerRating: {$type: "double"})
 > How many documents in the `100YWeatherSmall.data` collection do NOT contain the key `atmosphericPressureChange`.
 
 ```
-
 use 100YWeatherSmall
 db.data.find({atmosphericPressureChange:{$exists:false}})
 
@@ -96,12 +93,74 @@ db.shipwrecks.find({$or : [{watlev:"always dry"}, {depth: 0}]}).count()
 
 ```
 
-## All
+## $all
 
 * `$all` : all the values must be included in the keys array
 * specified as the value of a given key instead including key value pairs
 
+
 ```
+db.movieDetails.find({genres: {$all: ["Comedy", "Crime", "Drama"]}})
 
 ```
 
+> Connect to our class Atlas cluster from the mongo shell or Compass and view the `100YWeatherSmall.data`
+> collection. The `sections` field in this collection identifies supplementary readings available in a
+> given document by a three-character code. How many documents list: "AG1", "MD1", and "OA1" among the
+> codes in their `sections` array. Your count should include all documents that include these three codes
+> regardless of what other codes are also listed.
+
+```
+use 100YWeatherSmall
+db.data.find({sections: {$all: ["AG1", "MD1", "OA1"]}}).count()
+```
+
+## $size
+
+* `$size`: This can help you query for arrays of a certain size
+
+```
+db.movieDetails.find({countries: {$size:1}})
+```
+
+## $elemMatch
+
+* allows you to query fields where value is an array of objects on the per object level, instead of all values in the array.
+
+```
+use video
+
+// matching on a single element in the array which has this information
+db.movieDetails.find({boxOffice: {$elemMatch: {"country":"Germany", "revenue": {$gt:17}}}})
+
+//VS searching all elements in the array for the same criteria
+db.movieDetails.find({"boxOffice.country":"Germany", "boxOffice.revenue": {$gt:17}})
+```
+
+> In the M001 class Atlas cluster you will find a database added just for this week of the course.
+> It is called `results`. Within this database you will find two collections: `surveys` and `scores`.
+> Documents in the `results.surveys` collection have the following schema.
+
+```
+{_id: ObjectId("5964e8e5f0df64e7bc2d7373"),
+ results: [{product: "abc", score: 10}, {product: "xyz", score: 9}]}
+```
+> The field called `results` that has an array as its value. This array contains survey results for
+> products and lists the product name and the survey score for each product.
+> 
+> How many documents in the `results.surveys` collection contain a score of 7 for the product, "abc"?
+
+```
+use results
+
+db.surveys.find({results: {$elemMatch : {"product":"abc", "score": 7}}}).count()
+```
+
+## $regex
+
+* can be used to search for text patterns using a regex
+
+```
+db.movieDetails.find({})
+db.movieDetails.find({"awards.text": {$regex: /^Won .* /}})
+```
